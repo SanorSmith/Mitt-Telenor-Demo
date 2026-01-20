@@ -1,0 +1,159 @@
+<template>
+  <div class="space-y-6">
+    <h1 class="text-3xl font-bold text-gray-900">Usage Overview</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Data Usage</h3>
+          <Smartphone class="text-primary-500" :size="24" />
+        </div>
+        <div class="space-y-2">
+          <div class="flex justify-between items-end">
+            <span class="text-3xl font-bold text-gray-900">5.2 GB</span>
+            <span class="text-sm text-gray-600">of 10 GB</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="bg-primary-500 h-3 rounded-full transition-all" :style="{ width: '52%' }"></div>
+          </div>
+          <p class="text-sm text-gray-600">52% used • 4.8 GB remaining</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Voice Minutes</h3>
+          <Phone class="text-green-500" :size="24" />
+        </div>
+        <div class="space-y-2">
+          <div class="flex justify-between items-end">
+            <span class="text-3xl font-bold text-gray-900">120</span>
+            <span class="text-sm text-gray-600">of 300 min</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="bg-green-500 h-3 rounded-full transition-all" :style="{ width: '40%' }"></div>
+          </div>
+          <p class="text-sm text-gray-600">40% used • 180 min remaining</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">SMS</h3>
+          <MessageSquare class="text-blue-500" :size="24" />
+        </div>
+        <div class="space-y-2">
+          <div class="flex justify-between items-end">
+            <span class="text-3xl font-bold text-gray-900">45</span>
+            <span class="text-sm text-gray-600">of 100</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="bg-blue-500 h-3 rounded-full transition-all" :style="{ width: '45%' }"></div>
+          </div>
+          <p class="text-sm text-gray-600">45% used • 55 remaining</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-gray-900">Usage Trends</h2>
+        <select class="input w-auto">
+          <option>Last 7 days</option>
+          <option>Last 30 days</option>
+          <option>Last 90 days</option>
+        </select>
+      </div>
+      <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+        <p class="text-gray-500">Chart visualization would appear here</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
+      <div class="space-y-3">
+        <div
+          v-for="(activity, index) in recentActivity"
+          :key="index"
+          class="flex items-center justify-between py-3 border-b border-gray-200 last:border-0"
+        >
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-10 h-10 rounded-full flex items-center justify-center"
+              :class="getActivityColor(activity.type)"
+            >
+              <component :is="getActivityIcon(activity.type)" :size="20" />
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">{{ activity.description }}</p>
+              <p class="text-sm text-gray-600">{{ activity.amount }} • {{ activity.time }}</p>
+            </div>
+          </div>
+          <span class="text-sm text-gray-500">{{ activity.date }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Smartphone, Phone, MessageSquare, Wifi, PhoneCall, Mail } from 'lucide-vue-next'
+
+const recentActivity = ref([
+  {
+    type: 'data',
+    description: 'Data Usage',
+    amount: '250 MB',
+    time: '2:30 PM',
+    date: 'Today'
+  },
+  {
+    type: 'voice',
+    description: 'Voice Call',
+    amount: '15 minutes',
+    time: '11:45 AM',
+    date: 'Today'
+  },
+  {
+    type: 'sms',
+    description: 'SMS Sent',
+    amount: '3 messages',
+    time: '9:20 AM',
+    date: 'Today'
+  },
+  {
+    type: 'data',
+    description: 'Data Usage',
+    amount: '180 MB',
+    time: '8:15 PM',
+    date: 'Yesterday'
+  }
+])
+
+const getActivityIcon = (type: string) => {
+  switch (type) {
+    case 'data':
+      return Wifi
+    case 'voice':
+      return PhoneCall
+    case 'sms':
+      return Mail
+    default:
+      return Smartphone
+  }
+}
+
+const getActivityColor = (type: string) => {
+  switch (type) {
+    case 'data':
+      return 'bg-primary-100 text-primary-600'
+    case 'voice':
+      return 'bg-green-100 text-green-600'
+    case 'sms':
+      return 'bg-blue-100 text-blue-600'
+    default:
+      return 'bg-gray-100 text-gray-600'
+  }
+}
+</script>
