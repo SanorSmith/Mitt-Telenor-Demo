@@ -40,8 +40,14 @@ VALUES ('profiles', 'profiles', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Set up storage policies for profile images
+-- Drop existing policies if they exist, then recreate
+DROP POLICY IF EXISTS "Users can upload their own profile images" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own profile images" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own profile images" ON storage.objects;
+DROP POLICY IF EXISTS "Public can view profile images" ON storage.objects;
+
 -- Allow authenticated users to upload their own profile images
-CREATE POLICY IF NOT EXISTS "Users can upload their own profile images"
+CREATE POLICY "Users can upload their own profile images"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
@@ -51,7 +57,7 @@ WITH CHECK (
 );
 
 -- Allow authenticated users to update their own profile images
-CREATE POLICY IF NOT EXISTS "Users can update their own profile images"
+CREATE POLICY "Users can update their own profile images"
 ON storage.objects FOR UPDATE
 TO authenticated
 USING (
@@ -61,7 +67,7 @@ USING (
 );
 
 -- Allow authenticated users to delete their own profile images
-CREATE POLICY IF NOT EXISTS "Users can delete their own profile images"
+CREATE POLICY "Users can delete their own profile images"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (
@@ -71,7 +77,7 @@ USING (
 );
 
 -- Allow public read access to profile images
-CREATE POLICY IF NOT EXISTS "Public can view profile images"
+CREATE POLICY "Public can view profile images"
 ON storage.objects FOR SELECT
 TO public
 USING (bucket_id = 'profiles');
