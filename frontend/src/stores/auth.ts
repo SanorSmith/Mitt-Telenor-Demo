@@ -38,17 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (authError) throw authError
 
       if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: data.email,
-            first_name: data.firstName,
-            last_name: data.lastName
-          })
-
-        if (profileError) throw profileError
-
+        // Profile will be created automatically by database trigger
         user.value = authData.user
         return { success: true }
       }

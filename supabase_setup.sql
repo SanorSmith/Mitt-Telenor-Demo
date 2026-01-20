@@ -185,3 +185,23 @@ INSERT INTO plans (name, type, price, data_gb, voice_minutes, sms_count, feature
   ('Unlimited Mobile', 'mobile', 699, NULL, NULL, NULL, ARRAY['Unlimited Data', 'Unlimited Calls', 'Unlimited SMS', '5G Speed', 'Roaming Included'], false),
   ('Home Broadband', 'broadband', 399, NULL, NULL, NULL, ARRAY['100 Mbps', 'Unlimited Data', 'Free Router', '24/7 Support'], true),
   ('Fiber 500', 'broadband', 599, NULL, NULL, NULL, ARRAY['500 Mbps', 'Unlimited Data', 'Free Installation', 'WiFi 6 Router'], false);
+
+-- Auto-create profile trigger
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, first_name, last_name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'last_name', '')
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
