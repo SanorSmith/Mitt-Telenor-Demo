@@ -76,6 +76,19 @@
               />
             </div>
 
+            <div>
+              <label for="address" class="block text-sm font-medium text-gray-700 mb-1">
+                Address
+              </label>
+              <textarea
+                id="address"
+                v-model="formData.address"
+                rows="2"
+                class="input"
+                placeholder="Street address, city, postal code"
+              ></textarea>
+            </div>
+
             <div class="flex justify-end space-x-3">
               <button type="button" @click="resetForm" class="btn-secondary">
                 Cancel
@@ -123,12 +136,21 @@
         <div class="card">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">Profile Picture</h2>
           <div class="flex flex-col items-center">
-            <div class="w-32 h-32 rounded-full bg-primary-100 flex items-center justify-center mb-4">
-              <User :size="64" class="text-primary-500" />
+            <div class="w-32 h-32 rounded-full bg-primary-100 flex items-center justify-center mb-4 overflow-hidden">
+              <img v-if="formData.profilePictureUrl" :src="formData.profilePictureUrl" alt="Profile" class="w-full h-full object-cover" />
+              <User v-else :size="64" class="text-primary-500" />
             </div>
-            <button class="btn-secondary text-sm">
-              Upload Photo
-            </button>
+            <input
+              type="file"
+              id="photoUpload"
+              accept="image/*"
+              @change="handlePhotoUpload"
+              class="hidden"
+            />
+            <label for="photoUpload" class="btn-secondary text-sm cursor-pointer">
+              {{ formData.profilePictureUrl ? 'Change Photo' : 'Upload Photo' }}
+            </label>
+            <p class="text-xs text-gray-500 mt-2">Max 5MB, JPG/PNG</p>
           </div>
         </div>
 
@@ -137,17 +159,33 @@
           <div class="space-y-3">
             <div class="flex justify-between">
               <span class="text-gray-600">Member Since</span>
-              <span class="font-medium">Jan 2024</span>
+              <span class="font-medium">{{ accountStatus.memberSince }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Account Status</span>
-              <span class="font-medium text-green-600">Active</span>
+              <span class="font-medium" :class="accountStatus.isUnsubscribed ? 'text-red-600' : 'text-green-600'">
+                {{ accountStatus.isUnsubscribed ? 'Unsubscribed' : 'Active' }}
+              </span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Total Invoices</span>
-              <span class="font-medium">12</span>
+              <span class="font-medium">{{ accountStatus.totalInvoices }}</span>
             </div>
           </div>
+        </div>
+
+        <div v-if="!accountStatus.isUnsubscribed" class="card bg-red-50 border border-red-200">
+          <h2 class="text-xl font-semibold text-red-900 mb-2">Danger Zone</h2>
+          <p class="text-sm text-red-700 mb-4">
+            Unsubscribing will deactivate your account. You can reactivate by logging in again.
+          </p>
+          <button
+            @click="handleUnsubscribe"
+            :disabled="updating"
+            class="w-full bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ updating ? 'Processing...' : 'Unsubscribe Account' }}
+          </button>
         </div>
       </div>
     </div>
@@ -172,31 +210,61 @@ const formData = reactive({
   lastName: '',
   email: '',
   phone: '',
-  dateOfBirth: ''
+  dateOfBirth: '',
+  address: '',
+  profilePictureUrl: ''
+})
+
+const accountStatus = ref({
+  isUnsubscribed: false,
+  memberSince: '',
+  totalInvoices: 0
 })
 
 const loadProfile = async () => {
-  if (!authStore.user) return
+  if (!authStore.user) {
+    console.error('No authenticated user')
+    return
+  }
   
   loading.value = true
   try {
-    const { data, error } = await supabase
+    // Load profile data
+    const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', authStore.user.id)
       .single()
     
-    if (error) throw error
-    
-    if (data) {
-      formData.firstName = data.first_name || ''
-      formData.lastName = data.last_name || ''
-      formData.email = data.email || authStore.user.email || ''
-      formData.phone = data.phone || ''
-      formData.dateOfBirth = data.date_of_birth || ''
+    if (profileError) {
+      console.error('Profile error:', profileError)
+      // If profile doesn't exist, use auth user data
+      formData.email = authStore.user.email || ''
+    } else if (profileData) {
+      formData.firstName = profileData.first_name || ''
+      formData.lastName = profileData.last_name || ''
+      formData.email = profileData.email || authStore.user.email || ''
+      formData.phone = profileData.phone || ''
+      formData.dateOfBirth = profileData.date_of_birth || ''
+      formData.address = profileData.address || ''
+      formData.profilePictureUrl = profileData.profile_picture_url || ''
+      accountStatus.value.isUnsubscribed = profileData.is_unsubscribed || false
+      accountStatus.value.memberSince = profileData.created_at ? new Date(profileData.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : 'N/A'
     }
+    
+    // Load invoice count
+    const { count } = await supabase
+      .from('invoices')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', authStore.user.id)
+    
+    accountStatus.value.totalInvoices = count || 0
   } catch (error) {
     console.error('Error loading profile:', error)
+    // Ensure email is always set
+    if (!formData.email && authStore.user?.email) {
+      formData.email = authStore.user.email
+    }
   } finally {
     loading.value = false
   }
@@ -207,27 +275,35 @@ const resetForm = () => {
 }
 
 const handleUpdateProfile = async () => {
-  if (!authStore.user) return
+  if (!authStore.user) {
+    alert('You must be logged in to update your profile')
+    return
+  }
   
   updating.value = true
   try {
+    const updateData = {
+      first_name: formData.firstName.trim(),
+      last_name: formData.lastName.trim(),
+      phone: formData.phone.trim() || null,
+      address: formData.address.trim() || null,
+      date_of_birth: formData.dateOfBirth || null,
+      profile_picture_url: formData.profilePictureUrl || null,
+      updated_at: new Date().toISOString()
+    }
+    
     const { error } = await supabase
       .from('profiles')
-      .update({
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        phone: formData.phone,
-        date_of_birth: formData.dateOfBirth || null,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', authStore.user.id)
     
     if (error) throw error
     
     alert('Profile updated successfully!')
-  } catch (error) {
+    await loadProfile() // Reload to confirm changes
+  } catch (error: any) {
     console.error('Error updating profile:', error)
-    alert('Failed to update profile. Please try again.')
+    alert(`Failed to update profile: ${error.message || 'Please try again.'}`)
   } finally {
     updating.value = false
   }
@@ -246,6 +322,86 @@ const formatDate = (date: string) => {
     month: 'short',
     day: 'numeric'
   })
+}
+
+const handlePhotoUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (!file) return
+  
+  if (!file.type.startsWith('image/')) {
+    alert('Please select an image file')
+    return
+  }
+  
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image must be less than 5MB')
+    return
+  }
+  
+  updating.value = true
+  try {
+    // Upload to Supabase Storage
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${authStore.user?.id}-${Date.now()}.${fileExt}`
+    const filePath = `avatars/${fileName}`
+    
+    const { error: uploadError } = await supabase.storage
+      .from('profiles')
+      .upload(filePath, file, { upsert: true })
+    
+    if (uploadError) throw uploadError
+    
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('profiles')
+      .getPublicUrl(filePath)
+    
+    formData.profilePictureUrl = urlData.publicUrl
+    
+    // Update profile in database
+    await handleUpdateProfile()
+    
+    alert('Photo uploaded successfully!')
+  } catch (error: any) {
+    console.error('Error uploading photo:', error)
+    alert(`Failed to upload photo: ${error.message || 'Please try again.'}`)
+  } finally {
+    updating.value = false
+  }
+}
+
+const handleUnsubscribe = async () => {
+  if (!authStore.user) return
+  
+  const confirmed = confirm(
+    'Are you sure you want to unsubscribe? Your account will be deactivated and you will lose access to all services. You can reactivate later by logging in again.'
+  )
+  
+  if (!confirmed) return
+  
+  updating.value = true
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        is_unsubscribed: true,
+        unsubscribed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', authStore.user.id)
+    
+    if (error) throw error
+    
+    alert('Your account has been unsubscribed. You will be logged out.')
+    await authStore.logout()
+  } catch (error: any) {
+    console.error('Error unsubscribing:', error)
+    alert(`Failed to unsubscribe: ${error.message || 'Please try again.'}`)
+  } finally {
+    updating.value = false
+  }
 }
 
 onMounted(() => {

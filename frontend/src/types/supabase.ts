@@ -17,7 +17,10 @@ export interface Database {
           last_name: string
           phone: string | null
           address: string | null
+          date_of_birth: string | null
           profile_picture_url: string | null
+          is_unsubscribed: boolean
+          unsubscribed_at: string | null
           created_at: string
           updated_at: string
         }
@@ -28,7 +31,10 @@ export interface Database {
           last_name: string
           phone?: string | null
           address?: string | null
+          date_of_birth?: string | null
           profile_picture_url?: string | null
+          is_unsubscribed?: boolean
+          unsubscribed_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -39,7 +45,10 @@ export interface Database {
           last_name?: string
           phone?: string | null
           address?: string | null
+          date_of_birth?: string | null
           profile_picture_url?: string | null
+          is_unsubscribed?: boolean
+          unsubscribed_at?: string | null
           created_at?: string
           updated_at?: string
         }

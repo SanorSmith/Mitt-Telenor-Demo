@@ -12,7 +12,10 @@ CREATE TABLE profiles (
   last_name TEXT NOT NULL,
   phone TEXT,
   address TEXT,
+  date_of_birth DATE,
   profile_picture_url TEXT,
+  is_unsubscribed BOOLEAN DEFAULT FALSE,
+  unsubscribed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

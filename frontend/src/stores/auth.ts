@@ -65,6 +65,44 @@ export const useAuthStore = defineStore('auth', () => {
       if (error) throw error
 
       user.value = authData.user
+
+      // Check if user is unsubscribed
+      if (authData.user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('is_unsubscribed')
+          .eq('id', authData.user.id)
+          .single()
+
+        if (profileData?.is_unsubscribed) {
+          const reactivate = confirm(
+            'Your account was previously unsubscribed. Would you like to reactivate it?'
+          )
+
+          if (reactivate) {
+            // Reactivate account
+            await supabase
+              .from('profiles')
+              .update({
+                is_unsubscribed: false,
+                unsubscribed_at: null,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', authData.user.id)
+
+            return { success: true, reactivated: true }
+          } else {
+            // User declined reactivation, log them out
+            await supabase.auth.signOut()
+            user.value = null
+            return {
+              success: false,
+              error: 'Account is unsubscribed. Please reactivate to continue.'
+            }
+          }
+        }
+      }
+
       return { success: true }
     } catch (error: any) {
       return { 
