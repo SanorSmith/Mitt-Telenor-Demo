@@ -140,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import {
   Smartphone,
@@ -155,7 +155,36 @@ import {
   Zap
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import { supabase } from '@/lib/supabase'
 
 const authStore = useAuthStore()
-const user = computed(() => authStore.user)
+const user = ref<any>({ firstName: 'User', lastName: '' })
+
+const loadUserProfile = async () => {
+  if (!authStore.user) return
+  
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('first_name, last_name, email')
+      .eq('id', authStore.user.id)
+      .single()
+    
+    if (error) throw error
+    
+    if (data) {
+      user.value = {
+        firstName: data.first_name || 'User',
+        lastName: data.last_name || '',
+        email: data.email || authStore.user.email
+      }
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error)
+  }
+}
+
+onMounted(() => {
+  loadUserProfile()
+})
 </script>

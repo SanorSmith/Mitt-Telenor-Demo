@@ -34,6 +34,21 @@
         </div>
       </div>
 
+      <div v-if="activeAddOns.length > 0" class="mt-6 pt-6 border-t border-primary-400">
+        <h3 class="text-lg font-bold mb-3">Active Add-Ons</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div v-for="addOn in activeAddOns" :key="addOn.id" class="flex items-center justify-between bg-white/10 rounded-lg p-3">
+            <div>
+              <p class="font-semibold">{{ addOn.name }}</p>
+              <p class="text-sm text-primary-100">+{{ addOn.price }} SEK/month</p>
+            </div>
+            <button @click="removeAddOn(addOn)" class="text-white/80 hover:text-white text-sm">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="flex justify-end mt-6">
         <button @click="showChangePlanDialog" class="bg-white text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-primary-50 transition-colors">
           Change Plan
@@ -155,15 +170,21 @@ const availableAddOns = ref([
     id: '1',
     name: 'Extra 5GB Data',
     description: 'Additional 5GB data allowance',
-    price: 99
+    price: 99,
+    type: 'data',
+    dataBonus: 5
   },
   {
     id: '2',
     name: 'International Calls',
     description: '100 minutes international calls',
-    price: 149
+    price: 149,
+    type: 'voice',
+    voiceBonus: 100
   }
 ])
+
+const activeAddOns = ref<any[]>([])
 
 const selectPlan = (plan: any) => {
   if (confirm(`Switch to ${plan.name} for ${plan.price} SEK/month?`)) {
@@ -177,8 +198,42 @@ const showChangePlanDialog = () => {
 }
 
 const addAddOn = (addOn: any) => {
+  // Check if already added
+  if (activeAddOns.value.find(a => a.id === addOn.id)) {
+    alert('This add-on is already active!')
+    return
+  }
+  
   if (confirm(`Add ${addOn.name} for ${addOn.price} SEK/month?`)) {
-    alert('Add-on added successfully!')
+    activeAddOns.value.push({ ...addOn })
+    
+    // Update plan allowances based on add-on type
+    if (currentSubscription.value && addOn.type === 'data' && addOn.dataBonus) {
+      currentSubscription.value.plan.dataAllowanceGB += addOn.dataBonus
+    }
+    if (currentSubscription.value && addOn.type === 'voice' && addOn.voiceBonus) {
+      currentSubscription.value.plan.voiceMinutes += addOn.voiceBonus
+    }
+    
+    alert(`${addOn.name} added successfully! Your plan has been updated.`)
+  }
+}
+
+const removeAddOn = (addOn: any) => {
+  if (confirm(`Remove ${addOn.name}?`)) {
+    const index = activeAddOns.value.findIndex(a => a.id === addOn.id)
+    if (index > -1) {
+      // Restore original plan allowances
+      if (currentSubscription.value && addOn.type === 'data' && addOn.dataBonus) {
+        currentSubscription.value.plan.dataAllowanceGB -= addOn.dataBonus
+      }
+      if (currentSubscription.value && addOn.type === 'voice' && addOn.voiceBonus) {
+        currentSubscription.value.plan.voiceMinutes -= addOn.voiceBonus
+      }
+      
+      activeAddOns.value.splice(index, 1)
+      alert('Add-on removed successfully!')
+    }
   }
 }
 
