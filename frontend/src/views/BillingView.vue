@@ -2,10 +2,10 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <h1 class="text-3xl font-bold text-gray-900">Billing & Payments</h1>
-      <button class="btn-primary">
+      <RouterLink to="/payment-methods" class="btn-primary inline-flex items-center">
         <CreditCard :size="20" class="mr-2" />
-        Add Payment Method
-      </button>
+        Manage Payment Methods
+      </RouterLink>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -141,6 +141,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { CreditCard, Receipt, Download, CheckCircle } from 'lucide-vue-next'
 
 const invoices = ref([
