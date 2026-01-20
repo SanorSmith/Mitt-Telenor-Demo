@@ -331,7 +331,7 @@ const handlePhotoUpload = async (event: Event) => {
   if (!file) return
   
   if (!file.type.startsWith('image/')) {
-    alert('Please select an image file')
+    alert('Please select an image file (JPG, PNG, GIF, etc.)')
     return
   }
   
@@ -345,13 +345,18 @@ const handlePhotoUpload = async (event: Event) => {
     // Upload to Supabase Storage
     const fileExt = file.name.split('.').pop()
     const fileName = `${authStore.user?.id}-${Date.now()}.${fileExt}`
-    const filePath = `avatars/${fileName}`
+    const filePath = `avatars/${authStore.user?.id}/${fileName}`
     
     const { error: uploadError } = await supabase.storage
       .from('profiles')
       .upload(filePath, file, { upsert: true })
     
-    if (uploadError) throw uploadError
+    if (uploadError) {
+      if (uploadError.message.includes('Bucket not found')) {
+        throw new Error('Storage bucket not configured. Please run the database migration script (supabase_migration_profile_updates.sql) in your Supabase SQL Editor.')
+      }
+      throw uploadError
+    }
     
     // Get public URL
     const { data: urlData } = supabase.storage
@@ -361,14 +366,31 @@ const handlePhotoUpload = async (event: Event) => {
     formData.profilePictureUrl = urlData.publicUrl
     
     // Update profile in database
-    await handleUpdateProfile()
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        profile_picture_url: formData.profilePictureUrl,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', authStore.user!.id)
+    
+    if (updateError) throw updateError
     
     alert('Photo uploaded successfully!')
+    await loadProfile()
   } catch (error: any) {
     console.error('Error uploading photo:', error)
-    alert(`Failed to upload photo: ${error.message || 'Please try again.'}`)
+    let errorMessage = error.message || 'Please try again.'
+    
+    if (errorMessage.includes('row-level security')) {
+      errorMessage = 'Storage permissions not configured. Please run the migration script to set up storage policies.'
+    }
+    
+    alert(`Failed to upload photo: ${errorMessage}`)
   } finally {
     updating.value = false
+    // Reset file input
+    if (target) target.value = ''
   }
 }
 
