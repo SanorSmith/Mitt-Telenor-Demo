@@ -64,48 +64,42 @@
           <option value="90">Last 90 days</option>
         </select>
       </div>
-      <div class="h-80 bg-gray-50 rounded-lg p-6">
-        <div class="h-full flex flex-col">
-          <!-- Y-axis labels -->
-          <div class="flex items-center mb-2">
-            <div class="w-12 text-right text-xs text-gray-500 pr-2">High</div>
-            <div class="flex-1 border-t border-gray-300"></div>
-          </div>
-          
-          <!-- Chart area -->
-          <div class="flex-1 flex items-end justify-between space-x-3">
+      <div class="bg-gray-50 rounded-lg p-6 overflow-hidden">
+        <div class="flex flex-col" style="height: 280px;">
+          <!-- Chart area with fixed height -->
+          <div class="flex items-end justify-between space-x-2 mb-4" style="height: 240px;">
             <div v-for="(day, index) in usageTrends" :key="index" class="flex-1 flex flex-col items-center justify-end space-y-2">
-              <!-- Bars container -->
-              <div class="w-full flex items-end justify-center space-x-1" style="height: 200px">
+              <!-- Bars container with max height -->
+              <div class="w-full flex items-end justify-center gap-0.5" style="height: 200px; max-height: 200px;">
                 <!-- Data bar -->
-                <div class="flex-1 bg-primary-500 rounded-t transition-all hover:bg-primary-600 cursor-pointer relative group" 
-                     :style="{ height: (day.data / maxUsage * 100) + '%' }">
-                  <div class="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    Data: {{ day.data }} GB
+                <div class="flex-1 bg-primary-500 rounded-t transition-all hover:bg-primary-600 cursor-pointer relative group max-h-full" 
+                     :style="{ height: Math.min((day.data / maxUsage * 100), 100) + '%' }">
+                  <div class="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                    {{ day.data }} GB
                   </div>
                 </div>
                 <!-- Voice bar -->
-                <div class="flex-1 bg-green-500 rounded-t transition-all hover:bg-green-600 cursor-pointer relative group" 
-                     :style="{ height: (day.voice / maxUsage * 80) + '%' }">
-                  <div class="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    Voice: {{ day.voice }} min
+                <div class="flex-1 bg-green-500 rounded-t transition-all hover:bg-green-600 cursor-pointer relative group max-h-full" 
+                     :style="{ height: Math.min((day.voice / 50 * 100), 100) + '%' }">
+                  <div class="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                    {{ day.voice }} min
                   </div>
                 </div>
                 <!-- SMS bar -->
-                <div class="flex-1 bg-blue-500 rounded-t transition-all hover:bg-blue-600 cursor-pointer relative group" 
-                     :style="{ height: (day.sms / 50 * 100) + '%' }">
-                  <div class="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    SMS: {{ day.sms }}
+                <div class="flex-1 bg-blue-500 rounded-t transition-all hover:bg-blue-600 cursor-pointer relative group max-h-full" 
+                     :style="{ height: Math.min((day.sms / 30 * 100), 100) + '%' }">
+                  <div class="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                    {{ day.sms }} SMS
                   </div>
                 </div>
               </div>
               <!-- Day label -->
-              <span class="text-xs font-medium text-gray-600">{{ day.label }}</span>
+              <span class="text-xs font-medium text-gray-700">{{ day.label }}</span>
             </div>
           </div>
           
           <!-- X-axis line -->
-          <div class="border-t border-gray-300 mt-2"></div>
+          <div class="border-t border-gray-300"></div>
         </div>
       </div>
       
