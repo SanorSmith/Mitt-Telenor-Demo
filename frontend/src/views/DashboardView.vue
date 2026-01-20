@@ -103,7 +103,7 @@
         <div class="space-y-3">
           <div class="flex items-start space-x-3 pb-3 border-b border-gray-200">
             <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <CheckCircle class="text-green-600" :size="16} />
+              <CheckCircle class="text-green-600" :size="16" />
             </div>
             <div class="flex-1">
               <p class="text-sm font-medium text-gray-900">Payment Received</p>
