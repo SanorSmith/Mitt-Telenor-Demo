@@ -158,6 +158,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { User } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import { supabase } from '@/lib/supabase'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 const authStore = useAuthStore()
@@ -174,12 +175,30 @@ const formData = reactive({
   dateOfBirth: ''
 })
 
-const loadProfile = () => {
-  if (authStore.user) {
-    formData.firstName = authStore.user.firstName
-    formData.lastName = authStore.user.lastName
-    formData.email = authStore.user.email
-    formData.phone = authStore.user.phone || ''
+const loadProfile = async () => {
+  if (!authStore.user) return
+  
+  loading.value = true
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authStore.user.id)
+      .single()
+    
+    if (error) throw error
+    
+    if (data) {
+      formData.firstName = data.first_name || ''
+      formData.lastName = data.last_name || ''
+      formData.email = data.email || authStore.user.email || ''
+      formData.phone = data.phone || ''
+      formData.dateOfBirth = data.date_of_birth || ''
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -188,10 +207,30 @@ const resetForm = () => {
 }
 
 const handleUpdateProfile = async () => {
+  if (!authStore.user) return
+  
   updating.value = true
-  setTimeout(() => {
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        phone: formData.phone,
+        date_of_birth: formData.dateOfBirth || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', authStore.user.id)
+    
+    if (error) throw error
+    
+    alert('Profile updated successfully!')
+  } catch (error) {
+    console.error('Error updating profile:', error)
+    alert('Failed to update profile. Please try again.')
+  } finally {
     updating.value = false
-  }, 1000)
+  }
 }
 
 const markAsRead = (id: string) => {

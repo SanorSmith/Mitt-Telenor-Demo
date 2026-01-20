@@ -34,7 +34,7 @@
                 </div>
               </div>
               <div class="text-right">
-                <p class="font-bold text-gray-900">{{ invoice.amount }} NOK</p>
+                <p class="font-bold text-gray-900">{{ invoice.amount }} SEK</p>
                 <span
                   class="inline-block px-2 py-1 text-xs font-medium rounded-full"
                   :class="invoice.status === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'"
@@ -67,7 +67,7 @@
                 </div>
               </div>
               <div class="text-right">
-                <p class="font-semibold text-gray-900">{{ payment.amount }} NOK</p>
+                <p class="font-semibold text-gray-900">{{ payment.amount }} SEK</p>
                 <p class="text-sm text-gray-600">{{ payment.date }}</p>
               </div>
             </div>
@@ -79,7 +79,7 @@
         <div class="card">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">Current Balance</h2>
           <div class="text-center py-4">
-            <p class="text-4xl font-bold text-gray-900">0 NOK</p>
+            <p class="text-4xl font-bold text-gray-900">0 SEK</p>
             <p class="text-gray-600 mt-2">No outstanding balance</p>
           </div>
           <div class="mt-4 p-3 bg-green-50 rounded-lg">

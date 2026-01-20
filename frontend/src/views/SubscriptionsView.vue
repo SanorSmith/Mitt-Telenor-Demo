@@ -14,7 +14,7 @@
           <p class="text-primary-100">{{ currentSubscription.plan.description }}</p>
         </div>
         <div class="text-right">
-          <p class="text-3xl font-bold">{{ currentSubscription.plan.price }} NOK</p>
+          <p class="text-3xl font-bold">{{ currentSubscription.plan.price }} SEK</p>
           <p class="text-primary-100">per month</p>
         </div>
       </div>
@@ -35,7 +35,7 @@
       </div>
 
       <div class="flex justify-end mt-6">
-        <button class="bg-white text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-primary-50 transition-colors">
+        <button @click="showChangePlanDialog" class="bg-white text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-primary-50 transition-colors">
           Change Plan
         </button>
       </div>
@@ -57,7 +57,7 @@
 
           <div class="text-center mb-6">
             <p class="text-4xl font-bold text-gray-900">{{ plan.price }}</p>
-            <p class="text-gray-600">NOK/month</p>
+            <p class="text-gray-600">SEK/month</p>
           </div>
 
           <div class="space-y-3 mb-6">
@@ -84,6 +84,7 @@
           </button>
           <button
             v-else
+            @click="selectPlan(plan)"
             class="btn-primary w-full"
           >
             Select Plan
@@ -103,9 +104,9 @@
           <div>
             <h3 class="font-semibold text-gray-900">{{ addOn.name }}</h3>
             <p class="text-sm text-gray-600">{{ addOn.description }}</p>
-            <p class="text-lg font-bold text-primary-600 mt-2">{{ addOn.price }} NOK/month</p>
+            <p class="text-lg font-bold text-primary-600 mt-2">{{ addOn.price }} SEK/month</p>
           </div>
-          <button class="btn-primary">
+          <button @click="addAddOn(addOn)" class="btn-primary">
             Add
           </button>
         </div>
@@ -163,6 +164,23 @@ const availableAddOns = ref([
     price: 149
   }
 ])
+
+const selectPlan = (plan: any) => {
+  if (confirm(`Switch to ${plan.name} for ${plan.price} SEK/month?`)) {
+    currentSubscription.value = { plan }
+    alert('Plan changed successfully!')
+  }
+}
+
+const showChangePlanDialog = () => {
+  alert('Please select a new plan from the Available Plans section below.')
+}
+
+const addAddOn = (addOn: any) => {
+  if (confirm(`Add ${addOn.name} for ${addOn.price} SEK/month?`)) {
+    alert('Add-on added successfully!')
+  }
+}
 
 onMounted(() => {
   currentSubscription.value = {

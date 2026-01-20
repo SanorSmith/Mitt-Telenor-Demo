@@ -58,14 +58,33 @@
     <div class="card">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-xl font-semibold text-gray-900">Usage Trends</h2>
-        <select class="input w-auto">
-          <option>Last 7 days</option>
-          <option>Last 30 days</option>
-          <option>Last 90 days</option>
+        <select v-model="selectedPeriod" class="input w-auto">
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
         </select>
       </div>
-      <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-        <p class="text-gray-500">Chart visualization would appear here</p>
+      <div class="h-64 bg-gray-50 rounded-lg p-4">
+        <div class="h-full flex flex-col justify-end">
+          <div class="flex items-end justify-between h-full space-x-2">
+            <div v-for="(day, index) in usageTrends" :key="index" class="flex-1 flex flex-col items-center justify-end space-y-1">
+              <div class="w-full flex flex-col items-center justify-end space-y-1" style="height: 100%">
+                <!-- Data bar -->
+                <div class="w-full bg-primary-500 rounded-t transition-all hover:bg-primary-600" 
+                     :style="{ height: (day.data / maxUsage * 100) + '%' }"
+                     :title="`Data: ${day.data} GB`">
+                </div>
+              </div>
+              <span class="text-xs text-gray-600 mt-1">{{ day.label }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center justify-center space-x-6">
+        <div class="flex items-center space-x-2">
+          <div class="w-4 h-4 bg-primary-500 rounded"></div>
+          <span class="text-sm text-gray-600">Data Usage (GB)</span>
+        </div>
       </div>
     </div>
 
@@ -97,8 +116,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Smartphone, Phone, MessageSquare, Wifi, PhoneCall, Mail } from 'lucide-vue-next'
+
+const selectedPeriod = ref('7')
+
+const usageTrends = ref([
+  { label: 'Mon', data: 0.8 },
+  { label: 'Tue', data: 1.2 },
+  { label: 'Wed', data: 0.6 },
+  { label: 'Thu', data: 1.5 },
+  { label: 'Fri', data: 0.9 },
+  { label: 'Sat', data: 1.8 },
+  { label: 'Sun', data: 1.3 }
+])
+
+const maxUsage = computed(() => {
+  return Math.max(...usageTrends.value.map(d => d.data))
+})
 
 const recentActivity = ref([
   {

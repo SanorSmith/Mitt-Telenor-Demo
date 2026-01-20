@@ -5,7 +5,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="card hover:shadow-lg transition-shadow cursor-pointer">
         <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-          <HelpCircle class="text-primary-600" :size="24} />
+          <HelpCircle class="text-primary-600" :size="24" />
         </div>
         <h3 class="text-lg font-semibold text-gray-900 mb-2">FAQ</h3>
         <p class="text-gray-600 text-sm">Find answers to commonly asked questions</p>
