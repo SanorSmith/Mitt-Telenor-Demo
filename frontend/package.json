@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^5.5.1",
-    "@playwright/test": "^1.41.1",
+    "@playwright/test": "^1.40.1",
     "@rushstack/eslint-patch": "^1.7.0",
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.11.5",

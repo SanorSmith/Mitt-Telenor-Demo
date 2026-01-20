@@ -24,21 +24,23 @@ const TEST_USER = {
 
 async function registerUser(page: Page, userData = TEST_USER) {
   await page.goto(`${BASE_URL}/auth/register`);
-  await page.fill('input[name="firstName"]', userData.firstName);
-  await page.fill('input[name="lastName"]', userData.lastName);
-  await page.fill('input[name="email"]', userData.email);
-  await page.fill('input[name="phone"]', userData.phone);
-  await page.fill('input[name="password"]', userData.password);
+  await page.fill('#firstName', userData.firstName);
+  await page.fill('#lastName', userData.lastName);
+  await page.fill('#email', userData.email);
+  if (userData.phone) {
+    await page.fill('#phone', userData.phone);
+  }
+  await page.fill('#password', userData.password);
   await page.click('button[type="submit"]');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(3000);
 }
 
 async function loginUser(page: Page, email: string, password: string) {
   await page.goto(`${BASE_URL}/auth/login`);
-  await page.fill('input[type="email"]', email);
-  await page.fill('input[type="password"]', password);
+  await page.fill('#email', email);
+  await page.fill('#password', password);
   await page.click('button[type="submit"]');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(3000);
 }
 
 async function measurePerformance(page: Page, url: string) {
