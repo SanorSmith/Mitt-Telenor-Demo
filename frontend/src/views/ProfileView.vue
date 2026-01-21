@@ -309,8 +309,32 @@ const handleUpdateProfile = async () => {
     }
     
     if (!data || data.length === 0) {
-      console.warn('No rows were updated. Profile may not exist.')
-      throw new Error('Profile not found. Please run the migration script: supabase_migration_profile_updates.sql')
+      console.warn('No rows were updated. Profile may not exist. Attempting to create profile...')
+      
+      // Profile doesn't exist, create it
+      const { data: newProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: authStore.user.id,
+          email: authStore.user.email || '',
+          first_name: formData.firstName.trim(),
+          last_name: formData.lastName.trim(),
+          phone: formData.phone.trim() || null,
+          address: formData.address.trim() || null,
+          date_of_birth: formData.dateOfBirth || null,
+          profile_picture_url: formData.profilePictureUrl || null
+        })
+        .select()
+      
+      if (createError) {
+        console.error('Error creating profile:', createError)
+        throw new Error(`Failed to create profile: ${createError.message}`)
+      }
+      
+      console.log('Profile created successfully:', newProfile)
+      alert('Profile created and saved successfully!')
+      await loadProfile()
+      return
     }
     
     console.log('Profile updated successfully:', data)
