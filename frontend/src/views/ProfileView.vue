@@ -292,18 +292,45 @@ const handleUpdateProfile = async () => {
       updated_at: new Date().toISOString()
     }
     
-    const { error } = await supabase
+    console.log('Attempting to update profile with data:', updateData)
+    console.log('User ID:', authStore.user.id)
+    
+    const { data, error, count } = await supabase
       .from('profiles')
       .update(updateData)
       .eq('id', authStore.user.id)
+      .select()
     
-    if (error) throw error
+    console.log('Update response:', { data, error, count })
     
+    if (error) {
+      console.error('Supabase error details:', error)
+      throw error
+    }
+    
+    if (!data || data.length === 0) {
+      console.warn('No rows were updated. Profile may not exist.')
+      throw new Error('Profile not found. Please run the migration script: supabase_migration_profile_updates.sql')
+    }
+    
+    console.log('Profile updated successfully:', data)
     alert('Profile updated successfully!')
     await loadProfile() // Reload to confirm changes
   } catch (error: any) {
     console.error('Error updating profile:', error)
-    alert(`Failed to update profile: ${error.message || 'Please try again.'}`)
+    
+    let errorMessage = error.message || 'Please try again.'
+    
+    // Provide helpful error messages
+    if (error.message?.includes('column') && error.message?.includes('does not exist')) {
+      errorMessage = 'Database schema is missing columns. Please run the migration script (supabase_migration_profile_updates.sql) in your Supabase SQL Editor.'
+    } else if (error.message?.includes('row-level security')) {
+      errorMessage = 'Permission denied. Please check Row Level Security policies in Supabase.'
+    } else if (error.message?.includes('Profile not found')) {
+      errorMessage = error.message
+    }
+    
+    alert(`Failed to update profile: ${errorMessage}`)
   } finally {
     updating.value = false
   }
