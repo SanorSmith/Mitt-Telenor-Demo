@@ -2,10 +2,25 @@
 
 > A full-stack telecom customer self-service platform demonstrating modern web development practices
 
+## 🌐 Live Demo
+
+**🔒 Production (HTTPS - Recommended):**  
+**https://dhhho0vm7geyy.cloudfront.net**
+
+**Alternative (HTTP):**  
+http://mitt-telenor-demo-48625.s3-website.eu-north-1.amazonaws.com
+
+**Test Credentials:**
+- Email: `ansorsmith83@gmail.com`
+- Password: `PP@ssw0rd`
+
+---
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Vue](https://img.shields.io/badge/Vue-3.4-brightgreen.svg)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-green.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)
+![AWS](https://img.shields.io/badge/AWS-Deployed-orange.svg)
 
 ## 📋 Table of Contents
 - [Overview](#overview)
@@ -72,15 +87,13 @@ Mitt Telenor Demo is a production-ready Progressive Web App built to demonstrate
 - **Icons**: Lucide Vue Next
 
 ### Backend
-- **Framework**: .NET 8 (ASP.NET Core Web API)
-- **Language**: C# 12
-- **ORM**: Entity Framework Core 8
-- **Database**: PostgreSQL 16
-- **NoSQL**: DynamoDB
-- **Cache**: Redis 7
-- **Authentication**: JWT Bearer tokens
-- **Logging**: Serilog
-- **API Docs**: Swagger/OpenAPI
+- **Platform**: Supabase (Backend-as-a-Service)
+- **Database**: PostgreSQL (Supabase)
+- **Authentication**: Supabase Auth with JWT
+- **Storage**: Supabase Storage (Profile images)
+- **Real-time**: Supabase Realtime subscriptions
+- **API**: Auto-generated REST API
+- **Row Level Security**: PostgreSQL RLS policies
 
 ### CMS
 - **Platform**: Contentful
@@ -370,29 +383,43 @@ dotnet test --collect:"XPlat Code Coverage"
 
 ## 🚢 Deployment
 
-### AWS Deployment (Coming Soon)
+### AWS Deployment (Live on AWS!)
 
-1. **Configure AWS credentials**
-```bash
-aws configure
+**Current Deployment:**
+- **CloudFront URL (HTTPS):** https://dhhho0vm7geyy.cloudfront.net
+- **S3 Bucket:** mitt-telenor-demo-48625
+- **Region:** eu-north-1 (Stockholm)
+- **CloudFront Distribution:** E3JQX25MJ69KMA
+
+**Deployment Stack:**
+- ✅ S3 Static Website Hosting
+- ✅ CloudFront CDN with HTTPS
+- ✅ Automatic SSL/TLS Certificate
+- ✅ Global Edge Locations
+- ✅ PWA Support Enabled
+
+### Deploy Updates
+
+```powershell
+# 1. Build the application
+cd frontend
+npm run build
+cd ..
+
+# 2. Upload to S3
+aws s3 sync frontend/dist/ s3://mitt-telenor-demo-48625/ --delete
+
+# 3. Invalidate CloudFront cache
+aws cloudfront create-invalidation --distribution-id E3JQX25MJ69KMA --paths "/*"
 ```
 
-2. **Deploy infrastructure**
-```bash
-cd infrastructure
-npm install
-cdk deploy --all
-```
+### Deployment Scripts
+- `deploy-to-aws.ps1` - Full deployment script (PowerShell)
+- `deploy-to-aws.sh` - Full deployment script (Bash)
+- `complete-deployment.ps1` - CloudFront setup
+- `fix-deployment.ps1` - Fix S3 configuration
 
-3. **Deploy application**
-```bash
-# Automated via GitHub Actions on push to main
-# Or manually:
-./scripts/deploy.sh
-```
-
-### Manual Deployment
-See `docs/deployment.md` for detailed instructions
+See `deployment-info.txt` for complete deployment details
 
 ## 📖 API Documentation
 

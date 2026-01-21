@@ -8,7 +8,7 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.ico', 'robots.txt'],
       manifest: {
         name: 'Mitt Telenor Demo',
         short_name: 'Telenor',
@@ -16,53 +16,30 @@ export default defineConfig({
         theme_color: '#0066CC',
         background_color: '#ffffff',
         display: 'standalone',
-        orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: '/pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            src: '/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
           }
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.*/i,
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'api-cache',
+              cacheName: 'supabase-cache',
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 300
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/cdn\.contentful\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'contentful-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 3600
               }
             }
           }
@@ -81,6 +58,15 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5001',
         changeOrigin: true
+      }
+    }
+  },
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress type checking warnings during build
+        if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return
+        warn(warning)
       }
     }
   }

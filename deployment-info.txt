@@ -1,0 +1,31 @@
+﻿Mitt Telenor Demo - AWS Deployment Information
+================================================
+
+Deployment Date: 01/21/2026 00:50:14
+Region: eu-north-1
+
+S3 Bucket: mitt-telenor-demo-48625
+S3 Website URL: http://mitt-telenor-demo-48625.s3-website.eu-north-1.amazonaws.com
+
+CloudFront Distribution ID: E3JQX25MJ69KMA
+CloudFront URL: https://dhhho0vm7geyy.cloudfront.net
+
+Access your application:
+- S3 Direct: http://mitt-telenor-demo-48625.s3-website.eu-north-1.amazonaws.com
+- CloudFront (HTTPS): https://dhhho0vm7geyy.cloudfront.net
+
+Environment Variables (configured in .env):
+- VITE_SUPABASE_URL: https://vdxcfvvwomshydjuydoa.supabase.co
+- VITE_SUPABASE_ANON_KEY: (from .env file)
+
+To update the deployment:
+1. Make changes to your code
+2. Run: cd frontend && npm run build && cd ..
+3. Run: aws s3 sync frontend/dist/ s3://mitt-telenor-demo-48625/ --delete
+4. Run: aws cloudfront create-invalidation --distribution-id E3JQX25MJ69KMA --paths "/*"
+
+To delete the deployment:
+1. Disable distribution: aws cloudfront get-distribution-config --id E3JQX25MJ69KMA
+2. Delete files: aws s3 rm s3://mitt-telenor-demo-48625 --recursive
+3. Delete bucket: aws s3 rb s3://mitt-telenor-demo-48625
+4. Delete distribution after disabled
