@@ -30,7 +30,21 @@
 
     <div class="card">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-      <div class="space-y-4">
+      
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <p class="mt-2 text-gray-600">Loading FAQs...</p>
+      </div>
+      
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center py-8">
+        <p class="text-red-600">{{ error }}</p>
+        <p class="text-sm text-gray-600 mt-2">Using fallback FAQ data</p>
+      </div>
+      
+      <!-- FAQ Content -->
+      <div v-else class="space-y-4">
         <div
           v-for="(faq, index) in faqs"
           :key="index"
@@ -96,36 +110,64 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { HelpCircle, MessageCircle, Phone, ChevronDown } from 'lucide-vue-next'
+import { contentfulService } from '@/services/contentful'
 
-const faqs = ref([
-  {
-    question: 'How do I change my subscription plan?',
-    answer: 'You can change your subscription plan at any time from the Subscriptions page. Simply select your desired plan and confirm the change. The new plan will take effect immediately.',
-    isOpen: false
-  },
-  {
-    question: 'When will I be charged for my subscription?',
-    answer: 'You will be charged on the same day each month based on when you first subscribed. You can view your next billing date in the Billing section.',
-    isOpen: false
-  },
-  {
-    question: 'How do I check my data usage?',
-    answer: 'Visit the Usage page to see your current data, voice, and SMS usage. You can also view historical usage trends and set up usage alerts.',
-    isOpen: false
-  },
-  {
-    question: 'Can I add extra data to my plan?',
-    answer: 'Yes! You can purchase add-ons from the Subscriptions page. Add-ons are billed monthly and can be removed at any time.',
-    isOpen: false
-  },
-  {
-    question: 'How do I update my payment method?',
-    answer: 'Go to the Billing page and click "Add Payment Method". You can add multiple payment methods and set one as default.',
-    isOpen: false
+const faqs = ref([])
+const loading = ref(true)
+const error = ref('')
+
+onMounted(async () => {
+  try {
+    console.log('Loading FAQs from Contentful...')
+    const faqData = await contentfulService.getFAQs()
+    console.log('Loaded FAQs:', faqData)
+    
+    // Add isOpen property to each FAQ
+    faqs.value = faqData.map(faq => ({
+      ...faq,
+      isOpen: false
+    }))
+    
+    // If no FAQs from Contentful, use fallback data
+    if (faqs.value.length === 0) {
+      console.log('No FAQs from Contentful, using fallback data')
+      faqs.value = [
+        {
+          question: 'How do I change my subscription plan?',
+          answer: 'You can change your subscription plan at any time from the Subscriptions page. Simply select your desired plan and confirm the change.',
+          category: 'Subscriptions',
+          order: 1,
+          isOpen: false
+        },
+        {
+          question: 'How do I check my data usage?',
+          answer: 'Visit the Usage page to see your current data, voice, and SMS usage. You can also view historical usage trends.',
+          category: 'Usage',
+          order: 2,
+          isOpen: false
+        }
+      ]
+    }
+  } catch (err) {
+    console.error('Error loading FAQs:', err)
+    error.value = 'Failed to load FAQs from Contentful'
+    
+    // Fallback data
+    faqs.value = [
+      {
+        question: 'How do I change my subscription plan?',
+        answer: 'You can change your subscription plan at any time from the Subscriptions page.',
+        category: 'Subscriptions',
+        order: 1,
+        isOpen: false
+      }
+    ]
+  } finally {
+    loading.value = false
   }
-])
+})
 
 const contactForm = reactive({
   subject: '',
