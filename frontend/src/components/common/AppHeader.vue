@@ -16,8 +16,8 @@
               :key="item.name"
               :to="item.path"
               class="text-gray-600 hover:text-primary-500 transition-colors font-medium"
-              :class="{ 'text-primary-500': isActiveRoute(item.path) }"
-              exact
+              active-class=""
+              exact-active-class="!text-primary-500"
             >
               {{ item.name }}
             </RouterLink>
@@ -76,13 +76,6 @@ const navItems = [
   { name: 'Billing', path: '/billing' },
   { name: 'Support', path: '/support' }
 ]
-
-const isActiveRoute = (path: string) => {
-  const currentPath = router.currentRoute.value.path
-  const isActive = currentPath === path
-  console.log(`Route check: ${currentPath} === ${path} = ${isActive}`)
-  return isActive
-}
 
 const handleLogout = async () => {
   await authStore.logout()
