@@ -16,7 +16,8 @@
               :key="item.name"
               :to="item.path"
               class="text-gray-600 hover:text-primary-500 transition-colors font-medium"
-              active-class="text-primary-500"
+              :class="{ 'text-primary-500': $route.path === item.path }"
+              exact
             >
               {{ item.name }}
             </RouterLink>
