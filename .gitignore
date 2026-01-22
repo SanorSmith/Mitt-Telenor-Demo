@@ -80,3 +80,8 @@ lerna-debug.log*
 .cache/
 temp/
 tmp/
+
+# Test scripts with credentials
+test-contentful.js
+*-test.js
+*-debug.js

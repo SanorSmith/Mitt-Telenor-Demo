@@ -1,9 +1,19 @@
 // Test Contentful Connection
 import { createClient } from 'contentful'
 
+// Load credentials from environment variables
+const spaceId = process.env.VITE_CONTENTFUL_SPACE_ID
+const accessToken = process.env.VITE_CONTENTFUL_ACCESS_TOKEN
+
+if (!spaceId || !accessToken) {
+  console.error('❌ Contentful credentials not found in environment variables')
+  console.log('Please set VITE_CONTENTFUL_SPACE_ID and VITE_CONTENTFUL_ACCESS_TOKEN')
+  process.exit(1)
+}
+
 const client = createClient({
-  space: '455sis87wj48',
-  accessToken: 'phzfMIq8VW9RK1vQCyEjpxXa5H_FL-GVBEcAfNXmLjY'
+  space: spaceId,
+  accessToken: accessToken
 })
 
 async function testContentful() {
