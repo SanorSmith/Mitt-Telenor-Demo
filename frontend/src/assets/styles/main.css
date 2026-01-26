@@ -54,4 +54,19 @@
   .focus-visible-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
   }
+
+  .skip-link {
+    @apply absolute left-0 top-0 bg-primary-500 text-white px-4 py-2 z-50 transform -translate-y-full focus:translate-y-0 transition-transform;
+  }
+
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+}
+
+/* Enhanced focus visibility for all interactive elements */
+*:focus-visible {
+  outline: 2px solid #0066CC;
+  outline-offset: 2px;
 }

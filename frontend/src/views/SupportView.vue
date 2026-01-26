@@ -114,7 +114,15 @@ import { ref, reactive, onMounted } from 'vue'
 import { HelpCircle, MessageCircle, Phone, ChevronDown } from 'lucide-vue-next'
 import { contentfulService } from '@/services/contentful'
 
-const faqs = ref([])
+interface FAQ {
+  question: string
+  answer: string
+  category: string
+  order: number
+  isOpen: boolean
+}
+
+const faqs = ref<FAQ[]>([])
 const loading = ref(true)
 const error = ref('')
 

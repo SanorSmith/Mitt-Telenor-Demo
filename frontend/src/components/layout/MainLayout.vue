@@ -1,7 +1,8 @@
 <template>
   <div class="min-h-screen bg-gray-50">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <AppHeader />
-    <main class="container mx-auto px-4 py-8 max-w-7xl">
+    <main id="main-content" class="container mx-auto px-4 py-8 max-w-7xl" role="main" aria-label="Main content">
       <RouterView />
     </main>
     <AppFooter />

@@ -7,18 +7,18 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" role="region" aria-label="Usage statistics">
       <div class="card">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-900">Data Usage</h3>
-          <Smartphone class="text-primary-500" :size="24" />
+          <Smartphone class="text-primary-500" :size="24" aria-hidden="true" />
         </div>
         <div class="space-y-2">
           <div class="flex justify-between items-end">
             <span class="text-3xl font-bold text-gray-900">5.2 GB</span>
             <span class="text-sm text-gray-600">of 10 GB</span>
           </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-valuenow="52" aria-valuemin="0" aria-valuemax="100" aria-label="Data usage: 52% of 10 GB used">
             <div class="bg-primary-500 h-2 rounded-full" style="width: 52%"></div>
           </div>
           <p class="text-sm text-gray-600">52% used</p>
@@ -28,14 +28,14 @@
       <div class="card">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-900">Voice Minutes</h3>
-          <Phone class="text-green-500" :size="24" />
+          <Phone class="text-green-500" :size="24" aria-hidden="true" />
         </div>
         <div class="space-y-2">
           <div class="flex justify-between items-end">
             <span class="text-3xl font-bold text-gray-900">120</span>
             <span class="text-sm text-gray-600">of 300 min</span>
           </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="Voice minutes: 40% of 300 minutes used">
             <div class="bg-green-500 h-2 rounded-full" style="width: 40%"></div>
           </div>
           <p class="text-sm text-gray-600">40% used</p>
@@ -45,14 +45,14 @@
       <div class="card">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-900">SMS</h3>
-          <MessageSquare class="text-blue-500" :size="24" />
+          <MessageSquare class="text-blue-500" :size="24" aria-hidden="true" />
         </div>
         <div class="space-y-2">
           <div class="flex justify-between items-end">
             <span class="text-3xl font-bold text-gray-900">45</span>
             <span class="text-sm text-gray-600">of 100</span>
           </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" aria-label="SMS messages: 45% of 100 messages used">
             <div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div>
           </div>
           <p class="text-sm text-gray-600">45% used</p>
@@ -63,39 +63,43 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="card">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div class="grid grid-cols-2 gap-4">
+        <nav class="grid grid-cols-2 gap-4" aria-label="Quick actions">
           <RouterLink
             to="/subscriptions"
-            class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+            class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors focus-visible-ring"
+            aria-label="Manage subscription plans"
           >
-            <CreditCard class="text-primary-500 mb-2" :size="32" />
+            <CreditCard class="text-primary-500 mb-2" :size="32" aria-hidden="true" />
             <span class="text-sm font-medium text-gray-900">Manage Plans</span>
           </RouterLink>
 
           <RouterLink
             to="/billing"
-            class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+            class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors focus-visible-ring"
+            aria-label="Pay your bill"
           >
-            <Receipt class="text-primary-500 mb-2" :size="32" />
+            <Receipt class="text-primary-500 mb-2" :size="32" aria-hidden="true" />
             <span class="text-sm font-medium text-gray-900">Pay Bill</span>
           </RouterLink>
 
           <RouterLink
             to="/usage"
-            class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+            class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors focus-visible-ring"
+            aria-label="View detailed usage statistics"
           >
-            <BarChart3 class="text-primary-500 mb-2" :size="32" />
+            <BarChart3 class="text-primary-500 mb-2" :size="32" aria-hidden="true" />
             <span class="text-sm font-medium text-gray-900">View Usage</span>
           </RouterLink>
 
           <RouterLink
             to="/support"
-            class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+            class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors focus-visible-ring"
+            aria-label="Get help and support"
           >
-            <HelpCircle class="text-primary-500 mb-2" :size="32" />
+            <HelpCircle class="text-primary-500 mb-2" :size="32" aria-hidden="true" />
             <span class="text-sm font-medium text-gray-900">Get Help</span>
           </RouterLink>
-        </div>
+        </nav>
       </div>
 
       <div class="card">
