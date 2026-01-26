@@ -4,7 +4,7 @@ frontend:
     preBuild:
       commands:
         - cd frontend
-        - npm install --legacy-peer-deps
+        - npm install --legacy-peer-deps --force
     build:
       commands:
         - cd frontend
@@ -16,3 +16,6 @@ frontend:
   cache:
     paths:
       - frontend/node_modules/**/*
+build:
+  env:
+    NODE_VERSION: 18
