@@ -11,8 +11,7 @@
 http://mitt-telenor-demo-48625.s3-website.eu-north-1.amazonaws.com
 
 **Test Credentials:**
-- Email: `ansorsmith83@gmail.com`
-- Password: `PP@ssw0rd`
+
 
 ---
 
@@ -295,8 +294,7 @@ aws cloudfront create-invalidation --distribution-id E3JQX25MJ69KMA --paths "/*"
 
 ### Test Credentials
 ```
-Email: ansorsmith83@gmail.com
-Password: PP@ssw0rd
+
 ```
 
 ## 💻 Development
